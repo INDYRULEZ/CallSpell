@@ -68,10 +68,11 @@ Mit **+ Zauber hinzufügen** kommt eine Zeile dazu, mit **×** fliegt sie raus.
 /cs debug                  zeigt, was ankommt
 ```
 
-## Eigene Ansage (Voice Line) — von Hand
+## Ansagen
 
-Das Addon liefert **keine** Tondateien mit. Du kannst jede `.ogg` (Vorbis) oder `.mp3`
-nehmen, die du selbst erzeugt hast.
+Das Addon bringt drei Ansagen mit (`Sounds/assist.ogg`, `rescue.ogg`, `paradox.ogg`).
+Zeilen ohne eigene Stimme spielen **„Assist me"**. Du kannst in der Spalte „Stimme" aber
+jede eigene Datei eintragen — `.ogg` (Vorbis) oder `.mp3`.
 
 **1. Datei ablegen**
 

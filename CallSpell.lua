@@ -11,9 +11,12 @@ local ZIELE = {
         name = "Rescue",
         spellID = 370665,
         phrase = "rescue me",
-        sound = "",
+        sound = "Interface\\AddOns\\CallSpell\\Sounds\\rescue.ogg",
     },
 }
+
+-- Mitgelieferte Ansage (liegt im Addon selbst)
+local STANDARD_SOUND = "Interface\\AddOns\\CallSpell\\Sounds\\assist.ogg"
 
 local VORGABEN = {
     aktiv = true,
@@ -168,6 +171,7 @@ local function zeige(ziel, wer)
 
     if DB.ton then
         local pfad = ziel.sound
+        if not pfad or #pfad == 0 then pfad = STANDARD_SOUND end
         if pfad and #pfad > 0 then
             local gespielt = PlaySoundFile(pfad, "Master")
             if not gespielt and DB.debug then
@@ -571,7 +575,7 @@ local function aufbauen()
     end)
 
     y = y - 28
-    hinweis(c, "Symbol leer = Zauber-Symbol · Stimme leer = kein Ton (siehe README). × entfernt die Zeile.",
+    hinweis(c, "Symbol leer = Zauber-Symbol · Stimme leer = \"Assist me\" aus dem Addon. × entfernt die Zeile.",
         y, 520)
 
     -- ---------------- Kanaele
