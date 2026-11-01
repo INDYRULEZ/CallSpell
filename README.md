@@ -81,8 +81,11 @@ World of Warcraft\_retail_\Interface\AddOns\CustomSounds\meinezauber.ogg
 ```
 
 Der Ordner `CustomSounds` ist Absicht: kein Addon, keine `.toc` — dadurch fasst ihn kein
-Addon-Manager an, und die Dateien überleben jedes Update. (Ein Ordner *innerhalb* eines
-Addons würde beim nächsten Update überschrieben.)
+Addon-Manager an, die Dateien überleben jedes Update.
+
+> **Eigene Töne nicht in den Addon-Ordner legen.** WowUp & Co. ersetzen beim Update den
+> kompletten Ordner `AddOns\CallSpell\` — alles, was du dort ablegst, ist danach weg.
+> Nach `CustomSounds` legen und in der Spalte „Stimme" eintragen.
 
 **2. Pfad im Addon eintragen**
 
