@@ -14,11 +14,19 @@ nichts. Ein normales Addon hat dieses Problem nicht — es liest `CHAT_MSG_WHISP
 
 ## Installation
 
-1. Ordner `CallSpell` nach `World of Warcraft\_retail_\Interface\AddOns\` kopieren
-2. Spiel starten (oder `/reload`)
-3. Im Chat `/cs` eingeben — dann steht da, wie es weitergeht
+**Mit WowUp** (empfohlen, dann gibt es auch Updates):
 
-Es gibt kein WowUp-/Curse-Paket, das Addon liegt nur hier.
+1. In WowUp: *Addons* → *Install from URL* (bzw. *Repository hinzufügen*)
+2. `https://github.com/INDYRULEZ/CallSpell` eintragen
+3. Installieren — WowUp nimmt das neueste Release
+
+**Von Hand:**
+
+1. [Neuestes Release](https://github.com/INDYRULEZ/CallSpell/releases/latest) herunterladen
+2. ZIP entpacken, Ordner `CallSpell` nach `World of Warcraft\_retail_\Interface\AddOns\`
+3. Spiel starten (oder `/reload`)
+
+Danach im Chat `/cs` eingeben — dann steht da, wie es weitergeht.
 
 ## Einrichten
 
