@@ -70,6 +70,11 @@ Mit **+ Zauber hinzufügen** kommt eine Zeile dazu, mit **×** fliegt sie raus.
 
 ## Ansagen
 
+**Zusätzliche Ansagen als eigenes Addon:**
+[CallSpellSounds](https://github.com/INDYRULEZ/CallSpellSounds) — dort liegen dieselben drei
+Töne, aber getrennt vom Code. Vorteil: ein Update von Call Spell fasst die Töne nicht an.
+Pfad in der Spalte „Stimme" dann z. B. `Interface\AddOns\CallSpellSounds\Sounds\rescue.ogg`.
+
 Das Addon bringt drei Ansagen mit (`Sounds/assist.ogg`, `rescue.ogg`, `paradox.ogg`).
 Zeilen ohne eigene Stimme spielen **„Assist me"**. Du kannst in der Spalte „Stimme" aber
 jede eigene Datei eintragen — `.ogg` (Vorbis) oder `.mp3`.
@@ -127,8 +132,9 @@ Bei einem **neuen Dateinamen** ist das kein Thema.
 
 - Die Optionsseite **scrollt nicht**. Ab etwa sieben Zaubern läuft sie unten aus dem Fenster.
 - Die Töne werden nur abgespielt, nicht auf eine bestimmte Lautstärke normiert.
-- Getestet auf deutschem Client, Interface 120100 (Retail). Andere Versionen: `## Interface`
+- Getestet auf **englischem** Client, Interface 120100 (Retail). Andere Versionen: `## Interface`
   in der `.toc` anpassen.
+- Die Oberfläche ist auf Deutsch — unabhängig von der Spielsprache.
 - Fehlt der Zauber oder ist die SpellID falsch, wird kein Symbol gefunden — das Addon bleibt
   dann still.
 
