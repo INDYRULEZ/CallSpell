@@ -138,7 +138,7 @@ Bei einem **neuen Dateinamen** ist das kein Thema.
 - Die Töne werden nur abgespielt, nicht auf eine bestimmte Lautstärke normiert.
 - Getestet auf **englischem** Client, Interface 120100 (Retail). Andere Versionen: `## Interface`
   in der `.toc` anpassen.
-- Die Oberfläche ist auf Deutsch — unabhängig von der Spielsprache.
+- Die Oberfläche folgt der Spielsprache (Deutsch/Englisch), umschaltbar in den Einstellungen.
 - Fehlt der Zauber oder ist die SpellID falsch, wird kein Symbol gefunden — das Addon bleibt
   dann still.
 
