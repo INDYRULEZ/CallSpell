@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.4"
+local VERSION = "1.5"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -625,8 +625,8 @@ local function feld(eltern, x, y, breite, lesen, schreiben)
 end
 
 -- letzte Spalte (Makro-Knopf) hat absichtlich keine Ueberschrift
-local SPALTEN = { { "Name", 8, 70 }, { "SpellID", 82, 56 }, { "Symbol", 142, 56 },
-                  { "Flüstertext", 202, 86 }, { "Stimme", 292, 108 }, { "Standard Ziel", 404, 76 } }
+local SPALTEN = { { "col_name", 8, 70 }, { "col_spellid", 82, 56 }, { "col_symbol", 142, 56 },
+                  { "col_phrase", 202, 86 }, { "col_voice", 292, 108 }, { "col_target", 404, 76 } }
 
 -- Baut den gesamten Inhalt neu auf (nach Hinzufuegen/Entfernen eines Zaubers)
 local function aufbauen()
@@ -648,7 +648,7 @@ local function aufbauen()
     for _, spalte in ipairs(SPALTEN) do
         local fs = c:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
         fs:SetPoint("TOPLEFT", c, "TOPLEFT", spalte[2], y)
-        fs:SetText(spalte[1])
+        fs:SetText(T(spalte[1]))
     end
 
     local linie = c:CreateTexture(nil, "ARTWORK")
