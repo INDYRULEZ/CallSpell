@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.0"
+local VERSION = "1.4"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -15,10 +15,165 @@ local ZIELE = {
     },
 }
 
--- Mitgelieferte Ansage (liegt im Addon selbst)
+-- Mitgelieferte Standard-Ansage (liegt im Addon selbst)
 local STANDARD_SOUND = "Interface\\AddOns\\CallSpell\\Sounds\\assist.ogg"
 
+local TEXTE = {
+    de = {
+        zauber = "Zauber",
+        kanaele = "Kanäle",
+        verhalten = "Verhalten",
+        whitelist = "Wer darf auslösen",
+        sprache = "Sprache",
+        sprache_auto = "automatisch",
+        sprache_de = "Deutsch",
+        sprache_en = "Englisch",
+        col_name = "Name", col_spellid = "SpellID", col_symbol = "Symbol",
+        col_phrase = "Flüstertext", col_voice = "Stimme", col_target = "Standard Ziel",
+        cb_whisper = "Flüstern", cb_party = "Gruppe", cb_raid = "Raid",
+        cb_sound = "Ton abspielen", cb_debug = "Debug-Meldungen im Chat",
+        slider = "Anzeigedauer",
+        btn_add = "hinzufügen", btn_remove = "entfernen",
+        btn_macro = "Macro erstellen", btn_new = "+ Zauber hinzufügen",
+        hint_spells = "Symbol leer = Zauber-Symbol · Stimme leer = \"Assist me\". × entfernt die Zeile.",
+        hint_list = "Leere Liste = jeder. Sonst nur die eingetragenen Namen (ohne Realm).",
+        list_empty = "— noch niemand eingetragen, jeder darf auslösen —",
+        new_spell = "Neuer Zauber", spell_icon = "Zauber-Symbol",
+        geladen = "CallSpell %s geladen — /cs für Befehle",
+        test = "Testhinweis gezeigt",
+        an = "ist AN", aus = "ist AUS",
+        ton_an = "Ton: an", ton_aus = "Ton: aus",
+        kanal_unbekannt = "unbekannter Kanal: %s", kanal_gesetzt = "Kanal %s: %s",
+        an_kurz = "an", aus_kurz = "aus",
+        name_fehlt = "Name fehlt", steht_schon = "steht schon drauf: %s",
+        hinzugefuegt = "hinzugefügt: %s", entfernt = "entfernt: %s",
+        nicht_in_liste = "nicht in der Liste: %s",
+        liste_leer = "Liste ist leer — jeder darf auslösen",
+        liste_geleert = "Liste geleert — jeder darf auslösen",
+        phrase_fehlt = "Text fehlt", zahl_fehlt = "Zahl fehlt",
+        phrase_gesetzt = "%s: Flüstertext = %q",
+        icon_gesetzt = "%s: Symbol-ID = %s",
+        zauber_unbekannt = "unbekannter Zauber: %s",
+        neu_fehlt = "SpellID fehlt: /cs neu <SpellID> [Name]",
+        neu_gemacht = "hinzugefügt: %s (ID %d) — Flüstertext jetzt mit /cs phrase %d <Text> setzen",
+        weg_fehlt = "Zeile gibt es nicht",
+        debug_an = "Debug: an", debug_aus = "Debug: aus",
+        makro_angelegt = "Makro angelegt (charakterspezifisch): %s",
+        kein_platz = "kein freier Makro-Platz",
+        ankam = "ankam: %s von %s: %q (Kampf=%s)",
+        treffer = "Treffer %s von %s: %q",
+        kein_treffer = "kein Treffer: %q von %s",
+        ignoriert = "ignoriert (nicht auf der Liste): %s",
+        ton_fehler = "Ton nicht abspielbar: %s",
+        unbekannt = "unbekannter Befehl: %s",
+        hilfe_titel = "— Befehle:",
+        erlaubt = "erlaubt: %s",
+        zeile_falsch = "Zeilennummer fehlt oder falsch: /cs %s <Zeile> <Wert>",
+        hilfe = [[
+  /cs config                Einstellungen (auch: Optionen -> Addons -> Call Spell)
+  /cs test                  beide Hinweise zeigen
+  /cs an | /cs aus          Addon ein/aus
+  /cs ton an|aus            Ton ein/aus
+  /cs wer <Name>            Namen zur Liste hinzufuegen
+  /cs ohne <Name>           Namen entfernen
+  /cs liste                 erlaubte Namen zeigen
+  /cs alle                  Liste leeren (jeder darf)
+  /cs neu <SpellID> [Name]  neue Zeile in der Tabelle
+  /cs weg <Zeile>           Zeile entfernen
+  /cs phrase <Zeile> <Text> Fluestertext setzen
+  /cs icon <Zeile> <ID>     eigenes Symbol (0 = Zauber-Symbol)
+  /cs kanal fluester|gruppe|raid an|aus
+  /cs debug                 zeigt, was ankommt]],
+    },
+    en = {
+        zauber = "Spells",
+        kanaele = "Channels",
+        verhalten = "Behaviour",
+        whitelist = "Who may trigger",
+        sprache = "Language",
+        sprache_auto = "automatic",
+        sprache_de = "German",
+        sprache_en = "English",
+        col_name = "Name", col_spellid = "SpellID", col_symbol = "Icon",
+        col_phrase = "Whisper text", col_voice = "Voice", col_target = "Default target",
+        cb_whisper = "Whisper", cb_party = "Party", cb_raid = "Raid",
+        cb_sound = "Play sound", cb_debug = "Debug messages in chat",
+        slider = "Display duration",
+        btn_add = "add", btn_remove = "remove",
+        btn_macro = "Create macro", btn_new = "+ Add spell",
+        hint_spells = "Icon empty = spell icon · Voice empty = \"Assist me\". × removes the row.",
+        hint_list = "Empty list = everyone. Otherwise only the listed names (without realm).",
+        list_empty = "— nobody listed, everyone may trigger —",
+        new_spell = "New spell", spell_icon = "spell icon",
+        geladen = "CallSpell %s loaded — /cs for commands",
+        test = "Test hint shown",
+        an = "is ON", aus = "is OFF",
+        ton_an = "Sound: on", ton_aus = "Sound: off",
+        kanal_unbekannt = "unknown channel: %s", kanal_gesetzt = "Channel %s: %s",
+        an_kurz = "on", aus_kurz = "off",
+        name_fehlt = "name missing", steht_schon = "already listed: %s",
+        hinzugefuegt = "added: %s", entfernt = "removed: %s",
+        nicht_in_liste = "not in the list: %s",
+        liste_leer = "List is empty — everyone may trigger",
+        liste_geleert = "List cleared — everyone may trigger",
+        phrase_fehlt = "text missing", zahl_fehlt = "number missing",
+        phrase_gesetzt = "%s: whisper text = %q",
+        icon_gesetzt = "%s: icon ID = %s",
+        zauber_unbekannt = "unknown spell: %s",
+        neu_fehlt = "SpellID missing: /cs neu <SpellID> [Name]",
+        neu_gemacht = "added: %s (ID %d) — set the whisper text with /cs phrase %d <text>",
+        weg_fehlt = "no such row",
+        debug_an = "Debug: on", debug_aus = "Debug: off",
+        makro_angelegt = "macro created (character specific): %s",
+        kein_platz = "no free macro slot",
+        ankam = "received: %s from %s: %q (combat=%s)",
+        treffer = "match %s from %s: %q",
+        kein_treffer = "no match: %q from %s",
+        ignoriert = "ignored (not on the list): %s",
+        ton_fehler = "sound not playable: %s",
+        unbekannt = "unknown command: %s",
+        hilfe_titel = "— commands:",
+        erlaubt = "allowed: %s",
+        zeile_falsch = "row number missing or wrong: /cs %s <row> <value>",
+        hilfe = [[
+  /cs config                settings (also: Options -> AddOns -> Call Spell)
+  /cs test                  show both hints
+  /cs an | /cs aus          addon on/off
+  /cs ton an|aus            sound on/off
+  /cs wer <Name>            add a name to the list
+  /cs ohne <Name>           remove a name
+  /cs liste                 show the list
+  /cs alle                  clear the list (everyone may trigger)
+  /cs neu <SpellID> [Name]  add a row to the table
+  /cs weg <row>             remove a row
+  /cs phrase <row> <text>   set the whisper text
+  /cs icon <row> <ID>       custom icon (0 = spell icon)
+  /cs kanal fluester|gruppe|raid an|aus
+  /cs debug                 show what arrives]],
+    },
+}
+
+local function spracheWahl()
+    local quelle = CallSpellDB or DB
+    local wahl = (quelle and quelle.sprache) or "auto"
+    if wahl == "de" or wahl == "en" then return wahl end
+    local spiel = GetLocale and GetLocale() or "enUS"
+    if string.sub(spiel, 1, 2) == "de" then return "de" end
+    return "en"
+end
+
+local function T(schluessel, ...)
+    local sprache = spracheWahl()
+    local texte = TEXTE[sprache] or TEXTE.en
+    local wert = texte[schluessel] or TEXTE.en[schluessel] or schluessel
+    if select("#", ...) > 0 then
+        return string.format(wert, ...)
+    end
+    return wert
+end
+
 local VORGABEN = {
+    sprache = "auto",      -- "auto" | "de" | "en"
     aktiv = true,
     fluestern = true,
     gruppe = false,
@@ -80,7 +235,7 @@ function dbInit()
     end
     if type(DB.naechsteID) ~= "number" then DB.naechsteID = 1 end
     for _, e in ipairs(liste) do
-        if e.name == nil then e.name = "Zauber" end
+        if e.name == nil then e.name = T("zauber") end
         if e.spellID == nil then e.spellID = 0 end
         if e.icon == nil then e.icon = 0 end
         if e.phrase == nil then e.phrase = "" end
@@ -175,7 +330,7 @@ local function zeige(ziel, wer)
         if pfad and #pfad > 0 then
             local gespielt = PlaySoundFile(pfad, "Master")
             if not gespielt and DB.debug then
-                print("|cffff8080CallSpell|r Ton nicht abspielbar: " .. pfad)
+                print("|cffff8080CallSpell|r " .. T("ton_fehler", pfad))
             end
         end
     end
@@ -190,7 +345,7 @@ local function pruefe(event, text, wer)
     if not DB.aktiv then return end
 
     if DB.debug then
-        print(string.format("|cff8080ffCallSpell|r ankam: %s von %s: %q (Kampf=%s)",
+        print("|cff8080ffCallSpell|r " .. T("ankam",
             event, tostring(wer), tostring(text), tostring(InCombatLockdown())))
     end
 
@@ -200,7 +355,7 @@ local function pruefe(event, text, wer)
 
     if not istErlaubt(wer) then
         if DB.debug then
-            print("|cffff8080CallSpell|r ignoriert (nicht auf der Liste): " .. tostring(wer))
+            print("|cffff8080CallSpell|r " .. T("ignoriert", tostring(wer)))
         end
         return
     end
@@ -209,7 +364,7 @@ local function pruefe(event, text, wer)
         if passt(text, ziel) then
             local jetzt = GetTime()
             if DB.debug then
-                print(string.format("|cff80ff80CallSpell|r Treffer %s von %s: %q",
+                print("|cff80ff80CallSpell|r " .. T("treffer",
                     ziel.name, tostring(wer), tostring(text)))
             end
             if not letzterTreffer[ziel.id] or (jetzt - letzterTreffer[ziel.id]) >= DB.spamSekunden then
@@ -221,7 +376,7 @@ local function pruefe(event, text, wer)
     end
 
     if DB.debug then
-        print(string.format("|cffffcc00CallSpell|r kein Treffer: %q von %s", tostring(text), tostring(wer)))
+        print("|cffffcc00CallSpell|r " .. T("kein_treffer", tostring(text), tostring(wer)))
     end
 end
 
@@ -237,7 +392,7 @@ rahmen:SetScript("OnEvent", function(_, event, arg1, arg2, ...)
     if event == "ADDON_LOADED" then
         if arg1 ~= ADDON then return end
         dbInit()
-        print(string.format("|cff00ff00CallSpell %s geladen|r — /cs für Befehle", VERSION))
+        print("|cff00ff00CallSpell|r " .. T("geladen", VERSION))
         return
     end
     if event == "PLAYER_LOGIN" then
@@ -250,22 +405,12 @@ end)
 -- ---------------------------------------------------------------- Befehle
 
 local function hilfe()
-    print("|cff00ff00CallSpell|r — Befehle:")
-    print("  /cs config               — Einstellungen (auch: Optionen → Addons → Call Spell)")
-    print("  /cs test                 — beide Hinweise zeigen")
-    print("  /cs an | /cs aus         — Addon ein/aus")
-    print("  /cs ton an|aus           — Ton ein/aus")
-    print("  /cs wer <Name>           — Namen zur Liste hinzufügen")
-    print("  /cs ohne <Name>          — Namen entfernen")
-    print("  /cs liste                — erlaubte Namen zeigen")
-    print("  /cs alle                 — Liste leeren (jeder darf)")
-    print("  /cs neu <SpellID> [Name] — neue Zeile in der Tabelle")
-    print("  /cs weg <Zeile>          — Zeile entfernen")
-    print("  /cs phrase <Zeile> <Text> — Flüstertext setzen")
-    print("  /cs icon <Zeile> <ID>    — eigenes Symbol (0 = Zauber-Symbol)")
-    print("  /cs kanal fluester|gruppe|raid an|aus")
-    print("  /cs debug                — zeigt, was ankommt")
+    print("|cff00ff00CallSpell|r " .. T("hilfe_titel"))
+    for zeile in string.gmatch(T("hilfe"), "[^\n]+") do
+        print(zeile)
+    end
 end
+
 
 local function befehl(rest)
     istDa()
@@ -278,16 +423,16 @@ local function befehl(rest)
         for _, ziel in ipairs(DB.spells) do
             zeige(ziel, "Test")
         end
-        print("|cff00ff00CallSpell|r Testhinweis gezeigt")
+        print("|cff00ff00CallSpell|r " .. T("test"))
     elseif wort == "an" then
         DB.aktiv = true
-        print("|cff00ff00CallSpell|r ist AN")
+        print("|cff00ff00CallSpell|r " .. T("an"))
     elseif wort == "aus" then
         DB.aktiv = false
-        print("|cff00ff00CallSpell|r ist AUS")
+        print("|cff00ff00CallSpell|r " .. T("aus"))
     elseif wort == "ton" then
         DB.ton = (string.lower(reste) ~= "aus")
-        print("|cff00ff00CallSpell|r Ton: " .. (DB.ton and "an" or "aus"))
+        print("|cff00ff00CallSpell|r " .. (DB.ton and T("ton_an") or T("ton_aus")))
     elseif wort == "kanal" then
         local kanal, zustand = string.match(reste, "^(%S+)%s*(%S*)$")
         kanal = string.lower(kanal or "")
@@ -295,39 +440,39 @@ local function befehl(rest)
         if kanal == "fluester" or kanal == "flüstern" then DB.fluestern = an
         elseif kanal == "gruppe" then DB.gruppe = an
         elseif kanal == "raid" then DB.raid = an
-        else print("|cffff8080CallSpell|r unbekannter Kanal: " .. kanal) return end
-        print(string.format("|cff00ff00CallSpell|r Kanal %s: %s", kanal, an and "an" or "aus"))
+        else print("|cffff8080CallSpell|r " .. T("kanal_unbekannt", kanal)) return end
+        print("|cff00ff00CallSpell|r " .. T("kanal_gesetzt", kanal, an and T("an_kurz") or T("aus_kurz")))
     elseif wort == "wer" then
         local name = kurzName(reste)
-        if #name == 0 then print("|cffff8080CallSpell|r Name fehlt") return end
+        if #name == 0 then print("|cffff8080CallSpell|r " .. T("name_fehlt")) return end
         for _, e in ipairs(DB.whitelist) do
-            if e == name then print("|cff00ff00CallSpell|r steht schon drauf: " .. name) return end
+            if e == name then print("|cff00ff00CallSpell|r " .. T("steht_schon", name)) return end
         end
         table.insert(DB.whitelist, name)
-        print("|cff00ff00CallSpell|r hinzugefügt: " .. name)
+        print("|cff00ff00CallSpell|r " .. T("hinzugefuegt", name))
     elseif wort == "ohne" then
         local name = kurzName(reste)
         for i, e in ipairs(DB.whitelist) do
             if e == name then
                 table.remove(DB.whitelist, i)
-                print("|cff00ff00CallSpell|r entfernt: " .. name)
+                print("|cff00ff00CallSpell|r " .. T("entfernt", name))
                 return
             end
         end
-        print("|cffff8080CallSpell|r nicht in der Liste: " .. name)
+        print("|cffff8080CallSpell|r " .. T("nicht_in_liste", name))
     elseif wort == "liste" then
         if #DB.whitelist == 0 then
-            print("|cff00ff00CallSpell|r Liste ist leer — jeder darf auslösen")
+            print("|cff00ff00CallSpell|r " .. T("liste_leer"))
         else
-            print("|cff00ff00CallSpell|r erlaubt: " .. table.concat(DB.whitelist, ", "))
+            print("|cff00ff00CallSpell|r " .. T("erlaubt", table.concat(DB.whitelist, ", ")))
         end
     elseif wort == "alle" then
         DB.whitelist = {}
-        print("|cff00ff00CallSpell|r Liste geleert — jeder darf auslösen")
+        print("|cff00ff00CallSpell|r " .. T("liste_geleert"))
     elseif wort == "neu" then
         local nr, name = string.match(reste, "^(%S*)%s*(.-)$")
         local spellID = tonumber(nr)
-        if not spellID then print("|cffff8080CallSpell|r SpellID fehlt: /cs neu <SpellID> [Name]") return end
+        if not spellID then print("|cffff8080CallSpell|r " .. T("neu_fehlt")) return end
         DB.naechsteID = (DB.naechsteID or 1) + 1
         table.insert(DB.spells, {
             id = DB.naechsteID,
@@ -338,39 +483,39 @@ local function befehl(rest)
             sound = "",
             ziel = "",
         })
-        print(string.format("|cff00ff00CallSpell|r hinzugefügt: %s (ID %d) — Flüstertext jetzt mit /cs phrase %d <Text> setzen",
+        print("|cff00ff00CallSpell|r " .. T("neu_gemacht",
             (#name > 0) and name or ("Zauber " .. spellID), math.floor(spellID), #DB.spells))
     elseif wort == "weg" then
         local nr = tonumber(reste)
-        if not nr or not DB.spells[nr] then print("|cffff8080CallSpell|r Zeile gibt es nicht") return end
+        if not nr or not DB.spells[nr] then print("|cffff8080CallSpell|r " .. T("weg_fehlt")) return end
         local name = DB.spells[nr].name
         table.remove(DB.spells, nr)
-        print("|cff00ff00CallSpell|r entfernt: " .. tostring(name))
+        print("|cff00ff00CallSpell|r " .. T("entfernt", tostring(name)))
     elseif wort == "phrase" or wort == "icon" then
         local nr, wert = string.match(reste, "^(%S*)%s*(.-)$")
         local e = DB.spells[tonumber(nr) or 0]
-        if not e then print("|cffff8080CallSpell|r Zeilennummer fehlt oder falsch: /cs " .. wort .. " <Zeile> <Wert>") return end
+        if not e then print("|cffff8080CallSpell|r " .. T("zeile_falsch", wort)) return end
         if wort == "phrase" then
             if wert and #wert > 0 then
                 e.phrase = wert
-                print(string.format("|cff00ff00CallSpell|r %s: Flüstertext = %q", e.name, wert))
+                print("|cff00ff00CallSpell|r " .. T("phrase_gesetzt", e.name, wert))
             else
-                print("|cffff8080CallSpell|r Text fehlt") return
+                print("|cffff8080CallSpell|r " .. T("phrase_fehlt")) return
             end
         else
             local n = tonumber(wert)
-            if not n then print("|cffff8080CallSpell|r Zahl fehlt") return end
+            if not n then print("|cffff8080CallSpell|r " .. T("zahl_fehlt")) return end
             e.icon = (n > 0) and math.floor(n) or 0
-            print(string.format("|cff00ff00CallSpell|r %s: Symbol-ID = %s", e.name,
-                (e.icon > 0) and tostring(e.icon) or "Zauber-Symbol"))
+            print("|cff00ff00CallSpell|r " .. T("icon_gesetzt", e.name,
+                (e.icon > 0) and tostring(e.icon) or T("spell_icon")))
         end
     elseif wort == "config" or wort == "optionen" or wort == "einstellungen" then
         oeffneOptionen()
     elseif wort == "debug" then
         DB.debug = not DB.debug
-        print("|cff00ff00CallSpell|r Debug: " .. (DB.debug and "an" or "aus"))
+        print("|cff00ff00CallSpell|r " .. (DB.debug and T("debug_an") or T("debug_aus")))
     else
-        print("|cffff8080CallSpell|r unbekannter Befehl: " .. wort)
+        print("|cffff8080CallSpell|r " .. T("unbekannt", wort))
         hilfe()
     end
 end
@@ -415,9 +560,9 @@ local function makroErstellen(eintrag)
 
     local neu = CreateMacro(name, texture, koerper, true)   -- true = charakterspezifisch
     if neu then
-        print("|cff00ff00CallSpell|r Makro angelegt (charakterspezifisch): " .. name)
+        print("|cff00ff00CallSpell|r " .. T("makro_angelegt", name))
     else
-        print("|cffff8080CallSpell|r kein freier Makro-Platz")
+        print("|cffff8080CallSpell|r " .. T("kein_platz"))
     end
 end
 
@@ -497,7 +642,7 @@ local function aufbauen()
     local y = -16
 
     -- ---------------- Zauber-Tabelle
-    ueberschrift(c, "Zauber", y)
+    ueberschrift(c, T("zauber"), y)
     y = y - 30
 
     for _, spalte in ipairs(SPALTEN) do
@@ -542,7 +687,7 @@ local function aufbauen()
         local makro = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
         makro:SetSize(104, 20)
         makro:SetPoint("TOPLEFT", c, "TOPLEFT", 486, zy)
-        makro:SetText("Macro erstellen")
+        makro:SetText(T("btn_macro"))
         makro:SetScript("OnClick", function()
             makroErstellen(DB.spells[idx])
         end)
@@ -565,32 +710,31 @@ local function aufbauen()
     local neuerKnopf = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
     neuerKnopf:SetSize(150, 22)
     neuerKnopf:SetPoint("TOPLEFT", c, "TOPLEFT", 12, y)
-    neuerKnopf:SetText("+ Zauber hinzufügen")
+    neuerKnopf:SetText(T("btn_new"))
     neuerKnopf:SetScript("OnClick", function()
         DB.naechsteID = (DB.naechsteID or 1) + 1
-        table.insert(DB.spells, { id = DB.naechsteID, name = "Neuer Zauber", spellID = 0,
+        table.insert(DB.spells, { id = DB.naechsteID, name = T("new_spell"), spellID = 0,
                                   icon = 0, phrase = "", sound = "", ziel = "" })
         aufbauen()
         if optionenPanel.aktualisiere then optionenPanel.aktualisiere() end
     end)
 
     y = y - 28
-    hinweis(c, "Symbol leer = Zauber-Symbol · Stimme leer = \"Assist me\" aus dem Addon. × entfernt die Zeile.",
-        y, 520)
+    hinweis(c, T("hint_spells"), y, 520)
 
     -- ---------------- Kanaele
     y = y - 26
-    ueberschrift(c, "Kanäle", y)
+    ueberschrift(c, T("kanaele"), y)
     y = y - 30
-    kaestchen(c, "Flüstern", 16, y, function() return DB.fluestern end, function(w) DB.fluestern = w end)
-    kaestchen(c, "Gruppe", 170, y, function() return DB.gruppe end, function(w) DB.gruppe = w end)
-    kaestchen(c, "Raid", 300, y, function() return DB.raid end, function(w) DB.raid = w end)
+    kaestchen(c, T("cb_whisper"), 16, y, function() return DB.fluestern end, function(w) DB.fluestern = w end)
+    kaestchen(c, T("cb_party"), 170, y, function() return DB.gruppe end, function(w) DB.gruppe = w end)
+    kaestchen(c, T("cb_raid"), 300, y, function() return DB.raid end, function(w) DB.raid = w end)
 
     -- ---------------- Verhalten
     y = y - 40
-    ueberschrift(c, "Verhalten", y)
+    ueberschrift(c, T("verhalten"), y)
     y = y - 30
-    kaestchen(c, "Ton abspielen", 16, y, function() return DB.ton end, function(w) DB.ton = w end)
+    kaestchen(c, T("cb_sound"), 16, y, function() return DB.ton end, function(w) DB.ton = w end)
 
     local dauerWert = c:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     dauerWert:SetPoint("TOPLEFT", c, "TOPLEFT", 330, y - 6)
@@ -603,7 +747,7 @@ local function aufbauen()
     slider:SetMinMaxValues(1, 15)
     slider:SetValueStep(1)
     slider:SetObeyStepOnDrag(true)
-    if _G[sliderName .. "Text"] then _G[sliderName .. "Text"]:SetText("Anzeigedauer") end
+    if _G[sliderName .. "Text"] then _G[sliderName .. "Text"]:SetText(T("slider")) end
     if _G[sliderName .. "Low"] then _G[sliderName .. "Low"]:SetText("1") end
     if _G[sliderName .. "High"] then _G[sliderName .. "High"]:SetText("15") end
     slider:SetValue(DB.dauer)
@@ -615,8 +759,8 @@ local function aufbauen()
 
     -- ---------------- Whitelist
     y = y - 72
-    ueberschrift(c, "Wer darf auslösen", y)
-    hinweis(c, "Leere Liste = jeder. Sonst nur die eingetragenen Namen (ohne Realm).", y - 22, 430)
+    ueberschrift(c, T("whitelist"), y)
+    hinweis(c, T("hint_list"), y - 22, 430)
 
     local eingabe = CreateFrame("EditBox", nil, c)
     eingabe:SetSize(200, 22)
@@ -634,7 +778,7 @@ local function aufbauen()
     local hinzu = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
     hinzu:SetSize(110, 24)
     hinzu:SetPoint("LEFT", eingabe, "RIGHT", 8, 0)
-    hinzu:SetText("hinzufügen")
+    hinzu:SetText(T("btn_add"))
 
     local listeRahmen = CreateFrame("Frame", nil, c)
     listeRahmen:SetPoint("TOPLEFT", c, "TOPLEFT", 18, y - 74)
@@ -660,7 +804,7 @@ local function aufbauen()
             if not leerText then
                 leerText = inhalt:CreateFontString(nil, "ARTWORK", "GameFontDisable")
                 leerText:SetPoint("TOPLEFT", inhalt, "TOPLEFT", 2, -4)
-                leerText:SetText("— noch niemand eingetragen, jeder darf auslösen —")
+                leerText:SetText(T("list_empty"))
             end
             leerText:Show()
         elseif leerText then
@@ -680,7 +824,7 @@ local function aufbauen()
                 zeile.weg = CreateFrame("Button", nil, zeile, "UIPanelButtonTemplate")
                 zeile.weg:SetSize(100, 22)
                 zeile.weg:SetPoint("LEFT", zeile, "LEFT", 240, 0)
-                zeile.weg:SetText("entfernen")
+                zeile.weg:SetText(T("btn_remove"))
                 zeilen[i] = zeile
             end
             zeile.namensText:SetText(name)
@@ -717,8 +861,31 @@ local function aufbauen()
     zeichneListe()
 
     y = y - 74 - 78 - 6
-    kaestchen(c, "Debug-Meldungen im Chat", 16, y, function() return DB.debug end,
+    kaestchen(c, T("cb_debug"), 16, y, function() return DB.debug end,
         function(w) DB.debug = w end)
+
+    -- Sprache
+    y = y - 36
+    ueberschrift(c, T("sprache"), y)
+    y = y - 30
+    local sprachKnopf = CreateFrame("Button", nil, c, "UIPanelButtonTemplate")
+    sprachKnopf:SetSize(220, 22)
+    sprachKnopf:SetPoint("TOPLEFT", c, "TOPLEFT", 12, y)
+    local function sprachText()
+        local w = DB.sprache or "auto"
+        if w == "de" then return T("sprache_de") end
+        if w == "en" then return T("sprache_en") end
+        return T("sprache_auto")
+    end
+    sprachKnopf:SetText(sprachText())
+    sprachKnopf:SetScript("OnClick", function()
+        local w = DB.sprache or "auto"
+        if w == "auto" then DB.sprache = "de"
+        elseif w == "de" then DB.sprache = "en"
+        else DB.sprache = "auto" end
+        aufbauen()
+        if optionenPanel.aktualisiere then optionenPanel.aktualisiere() end
+    end)
 
     optionenPanel.aktualisiere = function()
         for _, satz in ipairs(felder) do

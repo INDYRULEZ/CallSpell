@@ -47,6 +47,10 @@ Die Tabelle hat eine Zeile pro Zauber:
 Darunter: Kanäle (Flüstern/Gruppe/Raid), Anzeigedauer, Ton an/aus und die Whitelist
 (leer = jeder darf auslösen).
 
+**Sprache:** Die Oberfläche und alle Meldungen gibt es auf **Deutsch und Englisch**. Standard ist
+automatisch nach Client-Sprache; unten in den Einstellungen lässt sich zwischen *automatisch*,
+*Deutsch* und *Englisch* umschalten.
+
 Mit **+ Zauber hinzufügen** kommt eine Zeile dazu, mit **×** fliegt sie raus.
 
 ### Befehle
