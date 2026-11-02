@@ -1,7 +1,7 @@
 ## Interface: 120100
 ## Title: Call Spell
 ## Notes: Hinweis, wenn dich jemand um einen Zauber bittet
-## Version: 1.6
+## Version: 1.7
 ## Author: INDYRULEZ
 ## SavedVariables: CallSpellDB
 CallSpell.lua
