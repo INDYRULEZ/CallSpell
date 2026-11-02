@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.8"
+local VERSION = "1.9"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -293,6 +293,62 @@ end
 
 local letzterTreffer = {}
 
+-- ---------------------------------------------------------------- Addon-Nachrichten
+-- Zweiter Weg neben dem Flüstertext: CallAssistance schickt die SpellID über den
+-- Addon-Kanal. Nötig, weil Blizzard den Chattext im Kampf sperrt.
+
+local ADDON_PREFIX = "CALLSPELL"
+local zeige        -- wird weiter unten definiert
+
+local function addonNachricht(praefix, text, kanal, absender)
+    if praefix ~= ADDON_PREFIX then return end
+    istDa()
+    if not DB.aktiv then return end
+    if not istErlaubt(absender) then return end
+
+    -- Auch hier kann der Text "secret" sein: alles in pcall.
+    local ok, spellID = pcall(function()
+        local treffer = string.match(text, "(%d+)")
+        return treffer and tonumber(treffer) or nil
+    end)
+
+    DB.letzteAddon = {
+        zeit = date("%H:%M:%S"),
+        imKampf = InCombatLockdown() and true or false,
+        kanal = kanal and tostring(kanal) or nil,
+        absender = absender and tostring(absender) or nil,
+        lesbar = ok and true or false,
+        spellID = ok and spellID or nil,
+        fehler = ok and nil or tostring(spellID),
+    }
+
+    if not ok then
+        if DB.debug then
+            print("|cffff4040CallSpell|r Addon-Nachricht nicht lesbar: " .. tostring(spellID))
+        end
+        return
+    end
+    if not spellID then return end
+
+    for _, ziel in ipairs(DB.spells) do
+        if ziel.spellID == spellID then
+            local jetzt = GetTime()
+            if not letzterTreffer[ziel.id] or (jetzt - letzterTreffer[ziel.id]) >= DB.spamSekunden then
+                letzterTreffer[ziel.id] = jetzt
+                zeige(ziel, absender)
+            end
+            if DB.debug then
+                print("|cff80ff80CallSpell|r Addon-Nachricht: " .. tostring(ziel.name)
+                    .. " von " .. tostring(absender))
+            end
+            return
+        end
+    end
+    if DB.debug then
+        print("|cffffcc00CallSpell|r Addon-Nachricht: unbekannte SpellID " .. tostring(spellID))
+    end
+end
+
 -- ---------------------------------------------------------------- Anzeige
 -- Nur das Symbol: kein Text, kein Rahmen.
 
@@ -317,7 +373,7 @@ anzeige:SetScript("OnUpdate", function(_, dt)
     end
 end)
 
-local function zeige(ziel, wer)
+zeige = function(ziel, wer)
     if ziel.icon and ziel.icon > 0 then
         icon:SetTexture(ziel.icon)
     else
@@ -398,6 +454,7 @@ end
 
 rahmen:RegisterEvent("ADDON_LOADED")
 rahmen:RegisterEvent("PLAYER_LOGIN")
+rahmen:RegisterEvent("CHAT_MSG_ADDON")
 rahmen:RegisterEvent("CHAT_MSG_WHISPER")
 rahmen:RegisterEvent("CHAT_MSG_PARTY")
 rahmen:RegisterEvent("CHAT_MSG_PARTY_LEADER")
@@ -412,7 +469,14 @@ rahmen:SetScript("OnEvent", function(_, event, arg1, arg2, ...)
         return
     end
     if event == "PLAYER_LOGIN" then
+        if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
+            C_ChatInfo.RegisterAddonMessagePrefix(ADDON_PREFIX)
+        end
         C_Timer.After(1, function() baueOptionen() end)
+        return
+    end
+    if event == "CHAT_MSG_ADDON" then
+        addonNachricht(arg1, arg2, arg3, arg4)
         return
     end
     pruefe(event, arg1, arg2)
