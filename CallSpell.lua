@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.7"
+local VERSION = "1.6"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -179,7 +179,6 @@ local VORGABEN = {
     gruppe = false,
     raid = false,
     ton = true,
-    fallback = true,      -- im Kampf ist der Flüstertext gesperrt → Fragezeichen-Alarm
     dauer = 5,
     spamSekunden = 3,
     debug = false,
@@ -346,18 +345,6 @@ end
 
 local rahmen = CreateFrame("Frame")
 
-local letzterErsatz = {}
-local FRAGEZEICHEN = 134400   -- INV_Misc_QuestionMark (ID, kein Pfad: zeige() vergleicht mit > 0)
-
--- Im Kampf ist der Flüstertext ein "secret string" — dann bleibt nur: Alarm ohne Zauber.
-local function zeigeErsatz(wer)
-    local jetzt = GetTime()
-    local werKurz = kurzName(wer or "")
-    if letzterErsatz[werKurz] and (jetzt - letzterErsatz[werKurz]) < DB.spamSekunden then return end
-    letzterErsatz[werKurz] = jetzt
-    zeige({ name = "?", icon = FRAGEZEICHEN, spellID = 0, sound = "" }, wer)
-end
-
 local function pruefe(event, text, wer)
     istDa()
     if not DB.aktiv then return end
@@ -378,11 +365,8 @@ local function pruefe(event, text, wer)
         return
     end
 
-    local gesperrt = false
     for _, ziel in ipairs(DB.spells) do
-        local treffer, blockiert = passt(text, ziel)
-        if blockiert then gesperrt = true end
-        if treffer then
+        if passt(text, ziel) then
             local jetzt = GetTime()
             if DB.debug then
                 print("|cff80ff80CallSpell|r " .. T("treffer",
@@ -394,14 +378,6 @@ local function pruefe(event, text, wer)
             end
             return
         end
-    end
-
-    if gesperrt and DB.fallback then
-        if DB.debug then
-            print("|cffffcc00CallSpell|r " .. T("text_gesperrt", tostring(wer)))
-        end
-        zeigeErsatz(wer)
-        return
     end
 
     if DB.debug then
