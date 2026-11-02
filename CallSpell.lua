@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.6"
+local VERSION = "1.8"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -350,8 +350,19 @@ local function pruefe(event, text, wer)
     if not DB.aktiv then return end
 
     if DB.debug then
-        print("|cff8080ffCallSpell|r " .. T("ankam",
-            event, tostring(wer), tostring(text), tostring(InCombatLockdown())))
+        -- Im Kampf sind Text/Absender evtl. "secret": jede Umwandlung kann werfen.
+        local okN, nInfo = pcall(function() return tostring(wer) end)
+        local okT, tInfo = pcall(function() return tostring(#text) end)
+        DB.letzteDiagnose = {
+            zeit = date("%H:%M:%S"),
+            imKampf = InCombatLockdown() and true or false,
+            absenderLesbar = okN and true or false,
+            absender = okN and tostring(nInfo) or nil,
+            textLesbar = okT and true or false,
+            textFehler = okT and nil or tostring(tInfo),
+        }
+        print("|cff8080ffCallSpell|r " .. event .. " · Absender lesbar=" .. tostring(okN)
+            .. " · Text lesbar=" .. tostring(okT) .. " · Kampf=" .. tostring(InCombatLockdown()))
     end
 
     if event == "CHAT_MSG_WHISPER" and not DB.fluestern then return end
