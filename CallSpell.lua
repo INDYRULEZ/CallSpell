@@ -2,7 +2,7 @@
 -- Eigenstaendiges Addon, keine Abhaengigkeiten.
 
 local ADDON = "CallSpell"
-local VERSION = "1.5"
+local VERSION = "1.6"
 
 -- Feste Eigenschaften je Zauber. Alles Einstellbare steht in DB.spells.
 local ZIELE = {
@@ -280,10 +280,15 @@ local function istErlaubt(name)
 end
 
 local function passt(text, ziel)
-    local t = normalisiere(text)
+    -- 🔴 Im Kampf kann der Flüstertext ein "secret string" sein: jede String-Funktion
+    -- darauf wirft einen Lua-Fehler. Deshalb hier kapseln statt den Handler sterben zu lassen.
+    local ok, t = pcall(normalisiere, text)
+    if not ok then return false, true end
     local p = normalisiere(ziel.phrase)
     if #p == 0 then return false end
-    return string.find(t, p, 1, true) ~= nil
+    local ok2, treffer = pcall(string.find, t, p, 1, true)
+    if not ok2 then return false, true end
+    return treffer ~= nil
 end
 
 local letzterTreffer = {}
